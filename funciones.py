@@ -29,9 +29,9 @@ def getDiametern(n, dmax, dmin):
     return soluc
 
 
-def intersect(a, b):
+def get_final_d_solution(a, b):
     """
-    Intersecta dos listas a y b
+    Intersecta dos listas a y b y retorna la solución final
     :param a: lista a
     :param b: lista b
     :return:
@@ -40,7 +40,7 @@ def intersect(a, b):
     for j in range(0, len(a)):
         for k in range(0, len(b)):
             if a[j][0] == b[k][0]:
-                sol.append([a[j][0], a[j][1], b[k][1]])
+                sol.append([a[j][0], a[j][1], 2 * b[k][1] - 1])
     return sol
 
 
@@ -56,15 +56,15 @@ def getCantTuberia(L, diam, k, l):
     return [round(diam * l * (k - 0.5), 1), round(L + diam * (l - 1), 1)]
 
 
-def getCantTuberiaFromD(d, pos, L):
+def getCantTuberiaFromD(d, pos, largo):
     """
     Retorna la cant de tub desde arreglo d con pos
     :param d: Arreglo
     :param pos: posicion
-    :param L: distancia de sistema a rio
+    :param largo: distancia de sistema a rio
     :return:
     """
-    return getCantTuberia(L, d[pos][0], d[pos][1], d[pos][2])
+    return getCantTuberia(largo, d[pos][0], d[pos][1], d[pos][2])
 
 
 def getAreaResidual(n, m, diam, k, l):
@@ -107,7 +107,11 @@ def getConsumoConMinimoRegadero(qhora, prop_regadero):
 
 
 def addComa(snum):
-    "Adicionar comas como separadores de miles a n. n debe ser de tipo string"
+    """
+    Añade comas como sumas
+    :param snum:
+    :return:
+    """
     s = str(float(snum))
     i = s.index('.')  # Se busca la posición del punto decimal
     while i > 3:

@@ -26,12 +26,12 @@ W_PRECIO = TUBERIAS_PRECIOS[ww]
 F = calculate_friction(ESPESOR, W * 1000)
 
 # Solución elegida
-v = 0
+v = 3
 
 # Se obtienen soluciones de diámetros
 dk = getDiametern(N, DMAX, DMIN)
 dl = getDiametern(M, DMAX, DMIN)
-d = intersect(dk, dl)
+d = get_final_d_solution(dk, dl)
 
 # Se obtienen valores
 k = d[v][1]  # Parámetro k

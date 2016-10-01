@@ -14,6 +14,6 @@ TUBERIAS = {
 
 TUBERIAS_PRECIOS = {
     0: 498,
-    1: 3685
+    1: 4948
 
 }
