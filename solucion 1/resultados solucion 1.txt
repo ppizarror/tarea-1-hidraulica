@@ -1,31 +1,33 @@
 Solución elegida:
-	Diámetro riego elegido: 1	(50.0 m)
-	Tubería gruesa elegida: 1	(0.11 mm)
-	Tubería peq. elegida:   0	(0.075 mm)
-	k:			4
-	l:			19
+	Diámetro alcance regador: 1	(50.0 m)
+	Tubería gruesa elegida:   1	(0.11 mm)
+	Tubería peq. elegida:     0	(0.075 mm)
+	k:			  4
+	l:			  19
 
 -----------------------------------------------------
 Materiales:
-	Diámetro riego:		50.0 m
-	Tuberías pequeñas:	3325.0 m
-	Tuberías gruesas:	470.0 m
-	Regaderos totales:	76
+	Diámetro riego:		 50.0 m
+	Tuberías pequeñas:	 3325.0 m
+	Tuberías gruesas:	 470.0 m
+	Diámetro tubería gruesa: 0.11 mm
+	Diámetro tubería peq.:   0.075 mm
+	Regaderos totales:	 76
 
 	Costo tuberías pequeñas: $ 7.198.625
 	Costo tuberías grandes:	 $ 2.325.715,1
 	Costo regaderos:	 $ 3.893.252
-	Costo total:		 $ 13.417.592,1
+	Costo válvulas:		 $ 844.303
+	Costo total:		 $ 14.261.895,1
 
 -----------------------------------------------------
-Valores variables:
-	Cota del rio:            -10 m
-	Radio curvatura inicial: 3 m
+Valores de la solución:
+	Cota del rio:           -10 m
+	Radio curv. inicial:     3 m
 	Fricción f:              0.00847
-	Diámetro tubería gruesa: 0.11 mm
-	Diámetro tubería peq.:   0.075 mm
 	Coef. pérdida regador:   0.1
 	Coef. pérdida válvulas:  0.25
+	Parámetro de error e:    0.2
 	KPSH:                    12.0 m
 
 	Consumo por regadero:	 0.00025 m3/s -> 0.9 m3/h
@@ -35,6 +37,6 @@ Valores variables:
 	Caudales por rama Q:	 0.012 m3/s	 0.00256 m3/s
 	Caudales entrada Qe:	 0.228 m3/s	 0.04856 m3/s
 	Reynolds: 		 2639078.3 	 562077.4
-	Coeficiente curva 3 m:	 0.505 	 	 0.657
-	Altura bomba grande:	 416.382 m 	 40.066 m
-	Altura bomba pequeña:	 31.121 m 	 12.871 m
+	Coeficiente curva 3 m:	 0.5048 	 0.6565
+	Altura bomba grande:	 416.376 m 	 40.066 m
+	Altura bomba pequeña:	 31.121 m 	 12.87 m

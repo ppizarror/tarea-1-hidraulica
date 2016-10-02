@@ -20,6 +20,7 @@ KREG = 0.1  # Pérdida en regaderos
 KVALV = 0.25
 ZC = -10  # Cota del rio
 PV = 10  # Presión de vapor
+PRECIO_VALVULA = 44437
 
 # Se obtienen soluciones de diámetros
 dk = get_diametern(N, DMAX, DMIN)
@@ -37,7 +38,9 @@ wp = 0  # Tubería pequeña
 # Se crea cada solución
 for v in range(4):
     # Se redirige el print a un archivo de texto
-    sys.stdout = open('solucion {0}/resultados.txt'.format(v + 1), 'w')
+    sys.stdout = open('solucion {0}/resultados solucion {0}.txt'.format(v +
+                                                                        1),
+                      'w')
 
     # Se escoge tubería grande
     W = TUBERIAS[ww]
@@ -74,8 +77,8 @@ for v in range(4):
     reynolds_max = round(calculo_reynolds(qe_max, W), 1)
 
     # Se calcula el coeficiente de pérdida para la curva
-    kc_min = round(calcular_coef_curva(qe_min, W, radio), 3)
-    kc_max = round(calcular_coef_curva(qe_max, W, radio), 3)
+    kc_min = round(calcular_coef_curva(qe_min, W, radio), 4)
+    kc_max = round(calcular_coef_curva(qe_max, W, radio), 4)
 
     # Se obtiene el total de tuberías
     total_tub_peq = get_cant_tuberia_from_d(d, v, L)[0]
@@ -83,8 +86,12 @@ for v in range(4):
     precio_tub_peq = WP_PRECIO * total_tub_peq
     precio_tub_grand = W_PRECIO * total_tub_grand
 
+    # Precio de las válvulas
+    precio_valv = PRECIO_VALVULA * l
+
     # Costo total
     costo_total = precio_tub_grand + precio_tub_peq + precio_regaderos
+    costo_total += precio_valv
 
     # Calculo de la bomba grande requerida
     b_min = calculate_b(PV, e, F, diam, W, qe_min, q_min, kc_min, L, l, ZC,
@@ -108,35 +115,38 @@ for v in range(4):
     # Se imprime el estado del plot
     #
     print 'Solución elegida:'
-    print '\tDiámetro riego elegido: {0}\t({1} m)'.format(v + 1, diam)
-    print '\tTubería gruesa elegida: {0}\t({1} mm)'.format(ww, W)
-    print '\tTubería peq. elegida:   {0}\t({1} mm)'.format(wp, WP)
-    print '\tk:\t\t\t{0}'.format(k)
-    print '\tl:\t\t\t{0}'.format(l)
+    print '\tDiámetro alcance regador: {0}\t({1} m)'.format(v + 1, diam)
+    print '\tTubería gruesa elegida:   {0}\t({1} mm)'.format(ww, W)
+    print '\tTubería peq. elegida:     {0}\t({1} mm)'.format(wp, WP)
+    print '\tk:\t\t\t  {0}'.format(k)
+    print '\tl:\t\t\t  {0}'.format(l)
 
     print LINEBAR
     print 'Materiales:'
-    print '\tDiámetro riego:\t\t{0} m'.format(diam)
-    print '\tTuberías pequeñas:\t{0} m'.format(total_tub_peq)
-    print '\tTuberías gruesas:\t{0} m'.format(total_tub_grand)
-    print '\tRegaderos totales:\t{0}'.format(k * l)
+    print '\tDiámetro riego:\t\t {0} m'.format(diam)
+    print '\tTuberías pequeñas:\t {0} m'.format(total_tub_peq)
+    print '\tTuberías gruesas:\t {0} m'.format(total_tub_grand)
+    print '\tDiámetro tubería gruesa: {0} mm'.format(W)
+    print '\tDiámetro tubería peq.:   {0} mm'.format(WP)
+    print '\tRegaderos totales:\t {0}'.format(k * l)
     print '\n\tCosto tuberías pequeñas: $ {0}'.format(
         add_coma(precio_tub_peq))
     print '\tCosto tuberías grandes:\t $ {0}'.format(
         add_coma(precio_tub_grand))
     print '\tCosto regaderos:\t $ {0}'.format(add_coma(precio_regaderos))
+    print '\tCosto válvulas:\t\t $ {0}'.format(add_coma(precio_valv))
     print '\tCosto total:\t\t $ {0}'.format(add_coma(costo_total))
 
     print LINEBAR
-    print 'Valores variables:'
-    print '\tCota del rio:            {0} m'.format(ZC)
-    print '\tRadio curvatura inicial: {0} m'.format(radio)
+    print 'Valores de la solución:'
+    print '\tCota del rio:           {0} m'.format(ZC)
+    print '\tRadio curv. inicial:     {0} m'.format(radio)
     print '\tFricción f:              {0}'.format(round(F, 5))
-    print '\tDiámetro tubería gruesa: {0} mm'.format(W)
-    print '\tDiámetro tubería peq.:   {0} mm'.format(WP)
     print '\tCoef. pérdida regador:   {0}'.format(KREG)
     print '\tCoef. pérdida válvulas:  {0}'.format(KVALV)
+    print '\tParámetro de error e:    {0}'.format(e)
     print '\tKPSH:                    {0} m'.format(PV * (1 + e))
+
     print '\n\tConsumo por regadero:\t {0} m3/s -> {1} m3/h'.format(
         get_consumo_caudal_regadio(C, diam), consumohora_por_regadero)
     print '\tConsumo agua total:\t {0} m3/h'.format(consumohora_total)
@@ -147,7 +157,7 @@ for v in range(4):
     print '\tCaudales entrada Qe:\t {0} m3/s\t {1} m3/s'.format(
         qe_min, qe_max)
     print '\tReynolds: \t\t {0} \t {1}'.format(reynolds_min, reynolds_max)
-    print '\tCoeficiente curva {2} m:\t {0} \t \t {1}'.format(kc_min, kc_max,
+    print '\tCoeficiente curva {2} m:\t {0} \t {1}'.format(kc_min, kc_max,
                                                               radio)
     print '\tAltura bomba grande:\t {0} m \t {1} m'.format(b_min, b_max)
     print '\tAltura bomba pequeña:\t {0} m \t {1} m'.format(bp_min, bp_max)
