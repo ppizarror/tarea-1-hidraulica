@@ -12,12 +12,13 @@ DDX = 0.05  # Porcentaje de holgura en el ancho
 DDY = 0.1  # Porcentaje de holgura en el alto
 
 
-def plot_solution(d, v, doplot):
+# noinspection SpellCheckingInspection
+def plot_solution(d, v, nums):
     """
     Plotea la solucion
     :param v: Solucion elegida
     :param d: Diametros
-    :param doplot:
+    :param nums: Numero de la solución
     :return:
     """
 
@@ -64,6 +65,4 @@ def plot_solution(d, v, doplot):
     plt.ylabel('$y$ [m]')
     plt.title('Esquema con $d={0}m$'.format(diam))
 
-    # Se muestra el gráfico
-    if doplot:
-        plt.show()
+    plt.savefig('solucion {0}/esquema_solucion.png'.format(nums), dpi=300)

@@ -5,14 +5,15 @@ Funciones extras para calcular necesidades.
 
 # Importación de librerías
 import math
+import matplotlib.pyplot as plt
 
 
 def get_diametern(n, dmax, dmin):
     """
-    Calcula el diametro para satisfacer un largo n
-    :param n: largo a cubir
-    :param dmax: diametro maximo
-    :param dmin: diametro minimo
+    Calcula el diámetro para satisfacer un largo n
+    :param n: largo a cubrir
+    :param dmax: diámetro maximo
+    :param dmin: diámetro mínimo
     :return:
     """
     j = 1.0
@@ -31,7 +32,8 @@ def get_diametern(n, dmax, dmin):
 
 def get_final_d_solution(a, b):
     """
-    Intersecta dos listas a y b y retorna la solución final
+    Intercepta dos listas a y b y retorna la solución final
+
     :param a: lista a
     :param b: lista b
     :return:
@@ -46,7 +48,7 @@ def get_final_d_solution(a, b):
 
 def get_cant_tuberia(lg, diam, k, l):
     """
-    Retorna la cantidad de tuberias
+    Retorna la cantidad de tuberías
     :param lg:
     :param diam:
     :param k:
@@ -60,7 +62,7 @@ def get_cant_tuberia_from_d(d, pos, largo):
     """
     Retorna la cant de tub desde arreglo d con pos
     :param d: Arreglo
-    :param pos: posicion
+    :param pos: posición
     :param largo: distancia de sistema a rio
     :return:
     """
@@ -69,11 +71,11 @@ def get_cant_tuberia_from_d(d, pos, largo):
 
 def get_area_residual(n, m, diam, k, l):
     """
-    Calcula el area residual de un rectangulo de nxm con nxl circulos de
+    Calcula el area residual de un rectángulo de nxm con nxl círculos de
     radio d
     :param n: alto
     :param m: ancho
-    :param diam: diametro
+    :param diam: diámetro
     :param k: cantidad en n
     :param l: cantidad en m
     :return:
@@ -121,9 +123,10 @@ def add_coma(snum):
     return s
 
 
+# noinspection SpellCheckingInspection
 def get_precios_regaderos(diametro):
     """
-    Retorna el precio por cada diametro
+    Retorna el precio por cada diámetro
     :param diametro:
     :return:
     """
@@ -142,7 +145,7 @@ def get_precios_regaderos(diametro):
 
 def calculo_reynolds(q, w):
     """
-    Calcula el reynolds con un caudal q y diametro tuberia w
+    Calcula el reynolds con un caudal q y diámetro tubería w
     :param q:
     :param w:
     :return:
@@ -152,7 +155,7 @@ def calculo_reynolds(q, w):
 
 def calcular_radio(l):
     """
-    Calcula el radio en fucion de su distancia
+    Calcula el radio en función de su distancia
     :param l:
     :return:
     """
@@ -161,7 +164,7 @@ def calcular_radio(l):
 
 def function_fc_coef_curva(re, w, r):
     """
-    Calculo fc parametro coef curva
+    Calculo fc parámetro coef curva
     :param re:
     :param w:
     :param r:
@@ -208,7 +211,7 @@ def calcular_coef_curva(q, w, r, ang=90):
 def alt_vel(q, w):
     """
     Retorna la altura de velocidad asociada al caudal q que pasa en un
-    diametro w
+    diámetro w
 
     :param q: Caudal.
     :param w: Diámetro.
@@ -220,7 +223,7 @@ def alt_vel(q, w):
 
 def calculate_friction(e, d):
     """
-    Calcula la fricción a partir del espesor y el diametro
+    Calcula la fricción a partir del espesor y el diámetro
     :param e:
     :param d:
     :return:
@@ -228,7 +231,7 @@ def calculate_friction(e, d):
     return 0.25 / math.pow(math.log10(float(d) / e) + 0.56820172, 2)
 
 
-def calculate_k_derivac(q, qo, qsigue=True):
+def calc_k_derivac(q, qo, qsigue=True):
     """
     Calcula el factor de la derivación.
     Qo -> Q1
@@ -265,34 +268,163 @@ def calculate_k_derivac(q, qo, qsigue=True):
             return 0.88 + (0.96 - 0.08) * (f - 0.8) / 0.2
 
 
-def calculate_b(pv, e, f, d, w, qe, q, pc, lar, l, zc, m, pent=0.5):
+def perdida_contracc(wg, wp):
+    """
+    Coeficiente de pérdida por contracción de la tubería
+    :param wg: Diámetro grande
+    :param wp: Diámetro pequeño
+    :return:
+    """
+    return math.pow(math.pow(wg, 2) / math.pow(wp, 2) - 1, 2)
+
+
+def calculate_b(pv, e, f, d, w, qe, q, pc, lar, l, zc, m, pent=0.44):
     """
     Calcula la altura de agua de la bomba B.
 
-    :param pv: Presion de vapor
-    :param e: Parametro de error asociado a presion de vapor
-    :param f: friccion en tuberia
-    :param d: Diametro de riego (diametro de alcance)
-    :param w: Diametro de tuberia
+    :param pv: Presión de vapor
+    :param e: Parámetro de error asociado a presión de vapor
+    :param f: fricción en tubería
+    :param d: Diámetro de riego (diámetro de alcance)
+    :param w: Diámetro de tubería
     :param qe: Caudal de entrada
     :param q: Caudal de salida por cada rama
     :param pc: Perdidas de codo
-    :param lar: Largo de tuberia antes de sistema
+    :param lar: Largo de tubería antes de sistema
     :param l: Cantidad de ramas
     :param zc: altura del rio
-    :param m: Largo de la tuberia gruesa
+    :param m: Largo de la tubería gruesa
     :param pent: Perdida entrada
     :return:
     """
 
     # Sumatoria por perdidas en friccion
     fper = 0.0
-    sf = f * float(m - d / 2) / (l * w)  # Perdida por friccion
+    sf = f * float(m - d) / (l * w)  # Perdida por friccion
     for i in range(1, l):
         qit = qe - i * q  # Caudal en cada tramo del tubo por friccion
-        sder = calculate_k_derivac(qe - i * q, qe + q * (1 - i))  # Derivación
+        if qit < 0:
+            break
+        sder = calc_k_derivac(qit, qe + q * (1 - i))  # Derivación
         fper += (sf + sder) * alt_vel(qit, w)
 
-    fper_prev = pc + pent + lar * f / w  # Factor de perdida para tuberia L
+    fper_prev = pc + pent + lar * f / w  # Factor de perdida para tubería L
     b = -zc + pv * (1 + e) + fper + fper_prev * alt_vel(qe, w)
     return b
+
+
+# noinspection SpellCheckingInspection
+def calculate_min_b(pv, e, f, d, w, wp, qe, q, pc, lar, l, k, zc, m, mp, b,
+                    kreg, kvalv, nums, etq, pent=0.44):
+    """
+    Calcula la altura de agua de la bomba B.
+
+    :param pv: Presión de vapor
+    :param e: Parámetro de error asociado a presión de vapor
+    :param f: friccion en tubería
+    :param d: Diámetro de riego (diámetro de alcance)
+    :param w: Diámetro de tubería
+    :param wp: Diámetro de tubería pequeña
+    :param qe: Caudal de entrada
+    :param q: Caudal de salida por cada rama
+    :param pc: Perdidas de codo
+    :param lar: Largo de tubería antes de sistema
+    :param l: Cantidad de ramas
+    :param k: Cantidad de regaderos en cada rama
+    :param zc: altura del rio
+    :param m: Largo de la tubería gruesa
+    :param mp: Largo de la tubería pequeña
+    :param b: Bomba instalada
+    :param kreg: Coeficiente de pérdida de los regaderos
+    :param kvalv: Coeficiente de pérdida en las válvulas
+    :param nums: Numero de la solucion
+    :param etq: Etiqueta a la imagen guardada
+    :param pent: Perdida entrada
+    :return:
+    """
+
+    # Se ejecuta para cada una de las cañerías pequeñas
+    b_min = []
+
+    # Gráficos
+    contrib_fricc_tub = []
+    contrib_fricc_tub_rama = []
+    contrib_bprev = []
+
+    # Se calcula el bernoulli antes de que empiecen las tuberías pequeñas
+    fper_prev = pc + pent + lar * f / w  # Factor de perdida para tubería L
+    b_prev = zc + b - fper_prev * alt_vel(qe, w) - 2 * pv * (1 + e)
+
+    # Perdida por friccion en tubería grande
+    sf = f * float(m - d) / (l * w)
+    sfp = f * float(mp - d / 2) / (k * wp)
+
+    # Se calcula la pérdida en cada rama
+    per_rama = 0.0
+    q_regadero = float(q) / k
+
+    # Se añade pérdida por fricción, derivación y regadero
+    for j in range(1, k):
+        qit = q - j * q_regadero  # Caudal en cada tramo del tubo por friccion
+        qpder = calc_k_derivac(qit, qit + q_regadero)
+        per_rama += (sfp + qpder) * alt_vel(qit, wp) + kreg * alt_vel(q, wp)
+
+    # Se calcula la bomba mínima en cada rama
+    for v in range(1, l + 1):
+
+        prama_i = per_rama
+
+        # Se añade la derivación a la tubería pequeña
+        prama_i += calc_k_derivac(q, qe + q * (1 - v), False) * alt_vel(q, wp)
+        prama_i += (perdida_contracc(w, wp) + kvalv) * alt_vel(
+            qe + q * (1 - v), wp)
+
+        k_tub_per = 0.0
+        # Se calcula la pérdida en la tubería grande hasta llegar a esa rama
+        for i in range(1, v):
+            qit = qe - i * q  # Caudal en cada tramo del tubo por friccion
+            if qit < 0:
+                break
+            # Derivación
+            sder = calc_k_derivac(qit, qe + q * (1 - i))
+            k_tub_per += (sf + sder) * alt_vel(qit, w)
+
+        b_min_ap = max(k_tub_per + prama_i - b_prev, 0)
+        cft = max(k_tub_per, 0)
+        cftr = max(k_tub_per + prama_i, 0)
+        contrib_fricc_tub.append(cft)
+        contrib_fricc_tub_rama.append(cftr)
+        contrib_bprev.append(b_prev)
+        b_min.append(b_min_ap)
+
+    # Se grafica la bomba vs rama
+    fig = plt.figure()
+    plt.xlabel('Numero de rama')
+    plt.ylabel('Altura minima de cada bomba [m]')
+    plt.title('Variacion altura minima por cada rama con Qe={0}m'.format(qe))
+    plt.grid(True)
+    plt.plot(range(1, l + 1), b_min, '-b', label='Altura bomba')
+    plt.legend(loc=4)
+    plt.savefig('solucion {0}/{1}_var_alt_minima_bomba.png'.format(nums, etq),
+                dpi=300)
+    plt.close(fig)
+
+    # Se grafican las contrib
+    fig = plt.figure()
+    plt.xlabel('Numero de rama')
+    plt.ylabel('Altura minima de cada bomba [m]')
+    plt.title('Contribucion de las perdidas en cada rama con Qe={0}m'.format(
+        qe))
+    plt.grid(True)
+    plt.plot(range(1, l + 1), contrib_fricc_tub, '-b', label='Friccion tubo '
+                                                             'grande')
+    plt.plot(range(1, l + 1), contrib_fricc_tub_rama, '-r',
+             label='Friccion tubo grande y pequeno')
+    plt.plot(range(1, l + 1), contrib_bprev, '-c',
+             label='Bernoulli previo a las ramas')
+    plt.legend(loc=4)
+    plt.savefig('solucion {0}/{1}_var_alt_perdidas_minima_bomba.png'.format(
+        nums, etq), dpi=300)
+    plt.close(fig)
+
+    return max(b_min)
