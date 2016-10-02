@@ -29,8 +29,8 @@ F = calculate_friction(ESPESOR, W * 1000)
 v = 3
 
 # Se obtienen soluciones de diámetros
-dk = getDiametern(N, DMAX, DMIN)
-dl = getDiametern(M, DMAX, DMIN)
+dk = get_diametern(N, DMAX, DMIN)
+dl = get_diametern(M, DMAX, DMIN)
 d = get_final_d_solution(dk, dl)
 
 # Se obtienen valores
@@ -39,10 +39,11 @@ l = d[v][2]  # Parámetro l
 diam = d[v][0]  # Diámetro
 
 # Se obtiene consumo por regaderos
-consumohora_por_regadero = 3600 * getConsumoCaudalRegadio(C, diam)
+consumohora_por_regadero = 3600 * get_consumo_caudal_regadio(C, diam)
 consumohora_total = k * l * consumohora_por_regadero
-fhrs = getConsumoConMinimoRegadero(consumohora_por_regadero, CAUDALES_RIEGO[v])
-precio_regaderos = getPreciosRegaderos(diam) * k * l
+fhrs = get_consumo_con_minimo_regadero(consumohora_por_regadero,
+                                       CAUDALES_RIEGO[v])
+precio_regaderos = get_precios_regaderos(diam) * k * l
 
 # Caudal de entrada máximo e mínimo
 qe_min = round(CAUDALES_RIEGO[v][1] * k * l / 3600, 3)
@@ -54,29 +55,35 @@ q_max = round(CAUDALES_RIEGO[v][0] * k / 3600, 3)
 radio = R
 
 # Se calcula el reynolds para qmin y qmax
-reynolds_min = calculo_reynolds(qe_min, W)
-reynolds_max = calculo_reynolds(qe_max, W)
+reynolds_min = round(calculo_reynolds(qe_min, W), 1)
+reynolds_max = round(calculo_reynolds(qe_max, W), 1)
 
 # Se calcula el coeficiente de pérdida para la curva
-kc_min = calcular_coef_curva(qe_min, W, radio)
-kc_max = calcular_coef_curva(qe_max, W, radio)
+kc_min = round(calcular_coef_curva(qe_min, W, radio), 3)
+kc_max = round(calcular_coef_curva(qe_max, W, radio), 3)
 
 # Se obtiene el total de tuberías
-total_tub_peq = getCantTuberiaFromD(d, v, L)[0]
-total_tub_grand = getCantTuberiaFromD(d, v, L)[1]
+total_tub_peq = get_cant_tuberia_from_d(d, v, L)[0]
+total_tub_grand = get_cant_tuberia_from_d(d, v, L)[1]
 precio_tub_peq = 0
 precio_tub_grand = W_PRECIO * total_tub_grand
 
 # Costo total
 costo_total = precio_tub_grand + precio_tub_peq + precio_regaderos
 
+# Calculo de la bomba grande requerida
+b_min = calculate_b(10, 1, F, diam, W, qe_min, q_min, kc_min, L, l, ZC, M)
+b_max = calculate_b(10, 1, F, diam, W, qe_max, q_max, kc_max, L, l, ZC, M)
+b_min = round(b_min, 3)
+b_max = round(b_max, 3)
+
 #
 # Se imprime el estado del plot
 #
 for di in range(0, len(d)):
-    print di, getAreaResidual(N, M, d[di][0], d[di][1], d[di][2])
+    print di, get_area_residual(N, M, d[di][0], d[di][1], d[di][2])
 for di in range(0, len(d)):
-    print di, d[di][0], getCantTuberiaFromD(d, di, L)
+    print di, d[di][0], get_cant_tuberia_from_d(d, di, L)
 
 print '\nSolución elegida: {0}'.format(v)
 print 'Diametro: {0}m'.format(diam)
@@ -87,32 +94,32 @@ print '\nTuberias pequeñas: {0}m'.format(total_tub_peq)
 print 'Tuberias gruesas: {0}m'.format(total_tub_grand)
 print 'Regaderos totales: {0}'.format(k * l)
 
-print '\nCosto tuberias pequeñas: {0}$'.format(addComa(precio_tub_peq))
-print 'Costo tuberias grandes: {0}$'.format(addComa(precio_tub_grand))
-print 'Costo regaderos: {0}$'.format(addComa(precio_regaderos))
-print 'Costo total: {0}$'.format(addComa(costo_total))
+print '\nCosto tuberias pequeñas: {0}$'.format(add_coma(precio_tub_peq))
+print 'Costo tuberias grandes: {0}$'.format(add_coma(precio_tub_grand))
+print 'Costo regaderos: {0}$'.format(add_coma(precio_regaderos))
+print 'Costo total: {0}$'.format(add_coma(costo_total))
 
 print '\nConsumo por regadero: {0} m3/s = {1} m3/h'.format(
-    getConsumoCaudalRegadio(C, diam), consumohora_por_regadero)
+    get_consumo_caudal_regadio(C, diam), consumohora_por_regadero)
 print 'Consumo agua total: {0} m3/h'.format(consumohora_total)
-print 'El sistema debe funcionar entre {1}, {0} horas a caudales Qe {2} m3/s y ' \
-      '{3} m3/s respectivamente'.format(fhrs[0], fhrs[1], qe_min, qe_max)
+print 'El sistema debe funcionar entre {1}, {0} horas a caudales Qe {2} m3/s' \
+      ' y {3} m3/s respectivamente'.format(fhrs[0], fhrs[1], qe_min, qe_max)
 
 print LINEBAR
 print 'Valores variables:'
 print '\tRadio curvatura inicial: {0}m'.format(radio)
-print '\tFriccion f: {0}'.format(F)
+print '\tFriccion f:\t\t\t\t {0}'.format(round(F, 5))
 print '\tDiametro tuberia gruesa: {0}mm'.format(W)
-print '\tCaudales por rama q [min, max]: {0} m3/s\t {1} m3/s'.format(q_min,
-                                                                     q_max)
-print '\tCaudales entrada qe [min, max]: {0}m'.format(qe_min, qe_max)
-print '\tReynolds [min, max]: {0} \t {1}'.format(reynolds_min, reynolds_max)
-print '\tCoeficiente perdida curva {2}m: {0} \t {1}'.format(kc_min, kc_max,
-                                                            radio),
-print LINEBAR
-
-# Se calcula b para el caudal mínimo
-calculate_b(10, GAMMA, 1, F, diam, W, qe_min, q_min, kc_min, L, l, ZC, M)
+print '\n\tTiempos funcionamiento:  {0}h\t\t {1}h'.format(fhrs[1], fhrs[0])
+print '\tCaudales por rama q:\t {0} m3/s\t {1} m3/s'.format(q_min,
+                                                            q_max)
+print '\tCaudales entrada qe:\t {0} m3/s\t {1} m3/s'.format(
+    qe_min, qe_max)
+print '\tReynolds: \t\t\t\t {0} \t {1}'.format(reynolds_min,
+                                               reynolds_max)
+print '\tCoeficiente curva {2}m:\t {0} \t \t {1}'.format(kc_min, kc_max,
+                                                         radio)
+print '\tAltura bomba grande:\t {0} \t {1}'.format(b_min, b_max)
 
 # Se plotea
-plot_solution(d, v, not False)
+plot_solution(d, v, False)

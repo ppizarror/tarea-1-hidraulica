@@ -7,7 +7,7 @@ Funciones extras para calcular necesidades.
 import math
 
 
-def getDiametern(n, dmax, dmin):
+def get_diametern(n, dmax, dmin):
     """
     Calcula el diametro para satisfacer un largo n
     :param n: largo a cubir
@@ -44,19 +44,19 @@ def get_final_d_solution(a, b):
     return sol
 
 
-def getCantTuberia(L, diam, k, l):
+def get_cant_tuberia(lg, diam, k, l):
     """
     Retorna la cantidad de tuberias
-    :param L:
+    :param lg:
     :param diam:
     :param k:
     :param l:
     :return:
     """
-    return [round(diam * l * (k - 0.5), 1), round(L + diam * (l - 1), 1)]
+    return [round(diam * l * (k - 0.5), 1), round(lg + diam * (l - 1), 1)]
 
 
-def getCantTuberiaFromD(d, pos, largo):
+def get_cant_tuberia_from_d(d, pos, largo):
     """
     Retorna la cant de tub desde arreglo d con pos
     :param d: Arreglo
@@ -64,10 +64,10 @@ def getCantTuberiaFromD(d, pos, largo):
     :param largo: distancia de sistema a rio
     :return:
     """
-    return getCantTuberia(largo, d[pos][0], d[pos][1], d[pos][2])
+    return get_cant_tuberia(largo, d[pos][0], d[pos][1], d[pos][2])
 
 
-def getAreaResidual(n, m, diam, k, l):
+def get_area_residual(n, m, diam, k, l):
     """
     Calcula el area residual de un rectangulo de nxm con nxl circulos de
     radio d
@@ -84,7 +84,7 @@ def getAreaResidual(n, m, diam, k, l):
     return [af - ad, round((af - ad) / af, 2), round(aff, 3) * 1000]
 
 
-def getConsumoCaudalRegadio(c, d):
+def get_consumo_caudal_regadio(c, d):
     """
     Calcula el consumo en m3/s de un regadero
     :param c:
@@ -94,19 +94,18 @@ def getConsumoCaudalRegadio(c, d):
     return c * math.pow(d, 2)
 
 
-def getConsumoConMinimoRegadero(qhora, prop_regadero):
+def get_consumo_con_minimo_regadero(qhora, prop_regadero):
     """
     Retorna la cantidad de horas que debe funcionar
     :param qhora:
     :param prop_regadero:
     :return:
     """
-    return [round(qhora * 24 / prop_regadero[0], 2), round(qhora * 24 /
-                                                           prop_regadero[1],
-                                                           2)]
+    return [round(qhora * 24 / prop_regadero[0], 3),
+            round(qhora * 24 / prop_regadero[1], 3)]
 
 
-def addComa(snum):
+def add_coma(snum):
     """
     Añade comas como sumas
     :param snum:
@@ -120,7 +119,7 @@ def addComa(snum):
     return s
 
 
-def getPreciosRegaderos(diametro):
+def get_precios_regaderos(diametro):
     """
     Retorna el precio por cada diametro
     :param diametro:
@@ -227,12 +226,48 @@ def calculate_friction(e, d):
     return 0.25 / math.pow(math.log10(float(d) / e) + 0.56820172, 2)
 
 
-def calculate_b(pv, gamma, e, f, d, w, qe, q, pc, lar, l, zc, m, pent=0.5):
+def calculate_k_derivac(q, qo, qsigue=True):
+    """
+    Calcula el factor de la derivación.
+    Qo -> Q1
+       |
+       Q2
+
+    :param q: Q que sigue por la tubería
+    :param qo: Q antes de la derivación
+    :param qsigue: Indicia si q es el que sigue en la tubería tras Qo
+    :return: Factor de pérdida
+    """
+    f = float(q) / qo
+    if qsigue:
+        if 0 <= f <= 0.2:
+            return 0.4 + 0.05 * f / 0.2
+        elif 0.2 < f <= 0.4:
+            return 0.45 + (0.2 - 0.45) * (f - 0.2) / 0.2
+        elif 0.4 < f <= 0.6:
+            return 0.2 + (0.1 - 0.2) * (f - 0.4) / 0.2
+        elif 0.6 < f <= 0.8:
+            return 0.1 + (0.05 - 0.1) * (f - 0.6) / 0.2
+        else:
+            return 0.05
+    else:
+        if 0 <= f <= 0.2:
+            return 1.3 + (1.1 - 1.3) * f / 0.2
+        elif 0.2 < f <= 0.4:
+            return 1.1 + (0.96 - 1.1) * (f - 0.2) / 0.2
+        elif 0.4 < f <= 0.6:
+            return 0.96 + (0.9 - 0.96) * (f - 0.4) / 0.2
+        elif 0.6 < f <= 0.8:
+            return 0.9 + (0.88 - 0.9) * (f - 0.6) / 0.2
+        else:
+            return 0.88 + (0.96 - 0.08) * (f - 0.8) / 0.2
+
+
+def calculate_b(pv, e, f, d, w, qe, q, pc, lar, l, zc, m, pent=0.5):
     """
     Calcula la altura de agua de la bomba B.
 
     :param pv: Presion de vapor
-    :param gamma: Gamma del agua
     :param e: Parametro de error asociado a presion de vapor
     :param f: friccion en tuberia
     :param d: Diametro de riego (diametro de alcance)
@@ -253,9 +288,9 @@ def calculate_b(pv, gamma, e, f, d, w, qe, q, pc, lar, l, zc, m, pent=0.5):
     sf = f * float(m - d / 2) / (l * w)  # Perdida por friccion
     for i in range(1, l):
         qit = qe - i * q  # Caudal en cada tramo del tubo por friccion
-        fper += sf * alt_vel(qit, w)
-    print fper
+        sder = calculate_k_derivac(qe - i * q, qe + q * (1 - i))  # Derivación
+        fper += (sf + sder) * alt_vel(qit, w)
 
     fper_prev = pc + pent + lar * f / w  # Factor de perdida para tuberia L
-    b = -zc + pv * (1 + e) / gamma + fper + fper_prev * alt_vel(qe, w)
-    print b
+    b = -zc + pv * (1 + e) + fper + fper_prev * alt_vel(qe, w)
+    return b
