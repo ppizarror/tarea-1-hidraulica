@@ -9,6 +9,11 @@ from graph import plot_solution
 from const import *
 from tuberias import *
 
+# Se eligen soluciones
+ww = 1  # Tubería grande
+wp = 0  # Tubería pequeña
+v = 3  # Solución del diámetro a usar
+
 # Constantes
 C = 1e-7  # Consumo m/s por unidad de Area
 CAUDALES_RIEGO = [[2.3, 10.8], [1.6, 2.2], [1.0, 1.2], [0.45, 0.72]]
@@ -17,16 +22,14 @@ e = 0.2  # Porcentaje de error en la presión de vapor
 KL = 2  # Perdida curva 90 grados
 ZC = -10  # Cota del rio
 
-# Se escoge tubería
-ww = 1
+# Se escoge tubería grande
 W = TUBERIAS[ww]
 W_PRECIO = TUBERIAS_PRECIOS[ww]
+WP = TUBERIAS[wp]
+WP_PRECIO = TUBERIAS_PRECIOS[wp]
 
 # Se calcula la fricción
 F = calculate_friction(ESPESOR, W * 1000)
-
-# Solución elegida
-v = 3
 
 # Se obtienen soluciones de diámetros
 dk = get_diametern(N, DMAX, DMIN)
@@ -65,7 +68,7 @@ kc_max = round(calcular_coef_curva(qe_max, W, radio), 3)
 # Se obtiene el total de tuberías
 total_tub_peq = get_cant_tuberia_from_d(d, v, L)[0]
 total_tub_grand = get_cant_tuberia_from_d(d, v, L)[1]
-precio_tub_peq = 0
+precio_tub_peq = WP_PRECIO * total_tub_peq
 precio_tub_grand = W_PRECIO * total_tub_grand
 
 # Costo total
@@ -80,46 +83,52 @@ b_max = round(b_max, 3)
 #
 # Se imprime el estado del plot
 #
+print LINEBAR.replace('\n', '')
+print 'Soluciones diametros:'
 for di in range(0, len(d)):
-    print di, get_area_residual(N, M, d[di][0], d[di][1], d[di][2])
-for di in range(0, len(d)):
-    print di, d[di][0], get_cant_tuberia_from_d(d, di, L)
+    print '\t', di, d[di][0], get_cant_tuberia_from_d(d, di, L)
 
-print '\nSolución elegida: {0}'.format(v)
-print 'Diametro: {0}m'.format(diam)
-print 'k: {0}'.format(k)
-print 'l: {0}'.format(l)
+print LINEBAR
+print 'Solución elegida:'
+print '\tDiametro riego elegido: {0}'.format(v)
+print '\tTuberia gruesa elegida: {0}'.format(ww)
+print '\tTubería peq. elegida:   {0}'.format(wp)
+print '\tk:\t\t\t\t\t\t{0}'.format(k)
+print '\tl:\t\t\t\t\t\t{0}'.format(l)
 
-print '\nTuberias pequeñas: {0}m'.format(total_tub_peq)
-print 'Tuberias gruesas: {0}m'.format(total_tub_grand)
-print 'Regaderos totales: {0}'.format(k * l)
-
-print '\nCosto tuberias pequeñas: {0}$'.format(add_coma(precio_tub_peq))
-print 'Costo tuberias grandes: {0}$'.format(add_coma(precio_tub_grand))
-print 'Costo regaderos: {0}$'.format(add_coma(precio_regaderos))
-print 'Costo total: {0}$'.format(add_coma(costo_total))
-
-print '\nConsumo por regadero: {0} m3/s = {1} m3/h'.format(
-    get_consumo_caudal_regadio(C, diam), consumohora_por_regadero)
-print 'Consumo agua total: {0} m3/h'.format(consumohora_total)
-print 'El sistema debe funcionar entre {1}, {0} horas a caudales Qe {2} m3/s' \
-      ' y {3} m3/s respectivamente'.format(fhrs[0], fhrs[1], qe_min, qe_max)
+print LINEBAR
+print 'Materiales:'
+print '\tDiametro riego:\t\t{0} m'.format(diam)
+print '\tTuberias pequeñas:\t{0} m'.format(total_tub_peq)
+print '\tTuberias gruesas:\t{0} m'.format(total_tub_grand)
+print '\tRegaderos totales:\t{0}'.format(k * l)
+print '\n\tCosto tuberias pequeñas:\t$ {0}'.format(add_coma(precio_tub_peq))
+print '\tCosto tuberias grandes:\t\t$ {0}'.format(add_coma(precio_tub_grand))
+print '\tCosto regaderos:\t\t\t$ {0}'.format(add_coma(precio_regaderos))
+print '\tCosto total:\t\t\t\t$ {0}'.format(add_coma(costo_total))
 
 print LINEBAR
 print 'Valores variables:'
 print '\tRadio curvatura inicial: {0}m'.format(radio)
 print '\tFriccion f:\t\t\t\t {0}'.format(round(F, 5))
 print '\tDiametro tuberia gruesa: {0}mm'.format(W)
-print '\n\tTiempos funcionamiento:  {0}h\t\t {1}h'.format(fhrs[1], fhrs[0])
-print '\tCaudales por rama q:\t {0} m3/s\t {1} m3/s'.format(q_min,
+print '\tDiametro tuberia peq.:   {0}mm'.format(WP)
+print '\n\tConsumo por regadero:\t {0} m3/s -> {1} m3/h'.format(
+    get_consumo_caudal_regadio(C, diam), consumohora_por_regadero)
+print '\tConsumo agua total:\t\t {0} m3/h'.format(consumohora_total)
+# print 'El sistema debe funcionar entre {1}, {0} horas a caudales Qe {2} m3/'\
+#      's y {3} m3/s respectivamente'.format(fhrs[0], fhrs[1], qe_min, qe_max)
+
+print '\n\tTiempos funcionamiento:  {0} h\t\t {1} h'.format(fhrs[1], fhrs[0])
+print '\tCaudales por rama Q:\t {0} m3/s\t {1} m3/s'.format(q_min,
                                                             q_max)
-print '\tCaudales entrada qe:\t {0} m3/s\t {1} m3/s'.format(
+print '\tCaudales entrada Qe:\t {0} m3/s\t {1} m3/s'.format(
     qe_min, qe_max)
 print '\tReynolds: \t\t\t\t {0} \t {1}'.format(reynolds_min,
                                                reynolds_max)
 print '\tCoeficiente curva {2}m:\t {0} \t \t {1}'.format(kc_min, kc_max,
                                                          radio)
-print '\tAltura bomba grande:\t {0} \t {1}'.format(b_min, b_max)
+print '\tAltura bomba grande:\t {0} m \t {1} m'.format(b_min, b_max)
 
 # Se plotea
 plot_solution(d, v, False)

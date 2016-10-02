@@ -53,7 +53,7 @@ def get_cant_tuberia(lg, diam, k, l):
     :param l:
     :return:
     """
-    return [round(diam * l * (k - 0.5), 1), round(lg + diam * (l - 1), 1)]
+    return [round(diam * l * (k - 0.5), 1), round(lg + diam / 2 * (l - 1), 1)]
 
 
 def get_cant_tuberia_from_d(d, pos, largo):
@@ -101,8 +101,8 @@ def get_consumo_con_minimo_regadero(qhora, prop_regadero):
     :param prop_regadero:
     :return:
     """
-    return [round(qhora * 24 / prop_regadero[0], 3),
-            round(qhora * 24 / prop_regadero[1], 3)]
+    return [round(qhora * 24 / prop_regadero[0], 4),
+            round(qhora * 24 / prop_regadero[1], 4)]
 
 
 def add_coma(snum):
@@ -116,6 +116,8 @@ def add_coma(snum):
     while i > 3:
         i -= 3
         s = s[:i] + ',' + s[i:]
+    s = s.replace('.', '-').replace(',', '.').replace('-', ',')
+    s = s.replace(',0', '')
     return s
 
 
