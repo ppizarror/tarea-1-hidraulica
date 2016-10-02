@@ -1,0 +1,40 @@
+Solución elegida:
+	Diámetro riego elegido: 2	(33.3 m)
+	Tubería gruesa elegida: 1	(0.11 mm)
+	Tubería peq. elegida:   0	(0.075 mm)
+	k:			6
+	l:			29
+
+-----------------------------------------------------
+Materiales:
+	Diámetro riego:		33.3 m
+	Tuberías pequeñas:	5311.3 m
+	Tuberías gruesas:	486.2 m
+	Regaderos totales:	174
+
+	Costo tuberías pequeñas: $ 11.498.964,5
+	Costo tuberías grandes:	 $ 2.405.87846
+	Costo regaderos:	 $ 2.494.812
+	Costo total:		 $ 16.399.654,546
+
+-----------------------------------------------------
+Valores variables:
+	Cota del rio:            -10 m
+	Radio curvatura inicial: 3 m
+	Fricción f:              0.00847
+	Diámetro tubería gruesa: 0.11 mm
+	Diámetro tubería peq.:   0.075 mm
+	Coef. pérdida regador:   0.1
+	Coef. pérdida válvulas:  0.25
+	KPSH:                    12.0 m
+
+	Consumo por regadero:	 0.000110889 m3/s -> 0.3992004 m3/h
+	Consumo agua total:	 69.4608696 m3/h
+
+	Tiempos funcionamiento:  4.3549 h		 5.988 h
+	Caudales por rama Q:	 0.00367 m3/s	 0.00267 m3/s
+	Caudales entrada Qe:	 0.10633 m3/s	 0.07733 m3/s
+	Reynolds: 		 1230759.6 	 895087.4
+	Coeficiente curva 3 m:	 0.575 	 	 0.607
+	Altura bomba grande:	 113.754 m 	 70.623 m
+	Altura bomba pequeña:	 15.268 m 	 13.73 m
